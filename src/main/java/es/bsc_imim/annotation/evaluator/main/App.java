@@ -1,7 +1,13 @@
 package es.bsc_imim.annotation.evaluator.main;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import org.apache.commons.cli.CommandLine;
@@ -100,15 +106,54 @@ public class App {
 				}
 			}
 			
-			String results = service.getFscoreMeasures(false);
-			String results2 = service.getClassificationMeasures(false);
-			System.out.println(results);
-			System.out.println(results2);
+			String results = service.getFscoreMeasures(true);
+			//String results2 = service.getClassificationMeasures(true);
+			try {
+				createTxtFile(outputPath, results);
+				//createTxtFile(outputPath+".classitifation.txt", results2);
+			} catch (FileNotFoundException e) {
+				System.out.println("App::processEvaluation :: FileNotFoundException " + outputPath);
+				System.out.println(e);
+			} catch (IOException e) {
+				System.out.println("App::processEvaluation :: IOException " + outputPath);
+				System.out.println(e);
+			}
+			
+			String results3 = service.getFscoreMeasuresCSV(true);
+			//String results4 = service.getClassificationMeasures(false);
+			System.out.println(results3);
+			//System.out.println(results4);
+			try {
+				createTxtFile(outputPath+".csv", results3);
+			} catch (FileNotFoundException e) {
+				System.out.println("App::processEvaluation :: FileNotFoundException " + outputPath);
+				System.out.println(e);
+			} catch (IOException e) {
+				System.out.println("App::processEvaluation :: IOException " + outputPath);
+				System.out.println(e);
+			}
 		}else {
 			System.out.println("App::processEvaluation :: No directory :  " + inputDirectoryPath);
 		}
 		System.out.println("App::processEvaluation :: END ");
 		
 	}
+	
+	/**
+	 * Create a plain text file with the given string
+	 * @param path
+	 * @param plainText
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	private static void createTxtFile(String path, String plainText) throws FileNotFoundException, IOException {
+		File fout = new File(path);
+		FileOutputStream fos = new FileOutputStream(fout);
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos,StandardCharsets.UTF_8));
+		bw.write(plainText);
+		bw.flush();
+		bw.close();
+	}
+	
    
 }
