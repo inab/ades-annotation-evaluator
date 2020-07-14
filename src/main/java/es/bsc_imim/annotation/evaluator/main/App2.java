@@ -123,7 +123,6 @@ public class App2 {
 										if(outputGATEFile.exists()) {
 											newDocument = Factory.newDocument(outputGATEFile.toURI().toURL(), "UTF-8");
 										}
-										
 										AnnotationSet as = gateDocument.getAnnotations("CasView0");
 										AnnotationSet findings = as.get("custom:FINDING");
 										AnnotationSet cdog = as.get("custom:CDoG");

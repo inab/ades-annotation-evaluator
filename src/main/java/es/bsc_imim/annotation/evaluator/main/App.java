@@ -41,7 +41,7 @@ public class App {
         input.setRequired(true);
         options.addOption(input);
         
-        Option output = new Option("o", "output", true, "Output file with the results");
+        Option output = new Option("o", "output", true, "Output folder");
         output.setRequired(true);
         options.addOption(output);
         
@@ -127,7 +127,7 @@ public class App {
 			String results = service.getFscoreMeasures(true);
 			//String results2 = service.getClassificationMeasures(true);
 			try {
-				createTxtFile(outputPath, results);
+				createTxtFile(outputPath+File.separator+goldStandardAnnotationSet+"_"+evaluationAnnotationSet+".txt", results);
 				//createTxtFile(outputPath+".classitifation.txt", results2);
 			} catch (FileNotFoundException e) {
 				System.out.println("App::processEvaluation :: FileNotFoundException " + outputPath);
@@ -138,11 +138,11 @@ public class App {
 			}
 			
 			String results3 = service.getFscoreMeasuresCSV(true);
-			//String results4 = service.getClassificationMeasures(false);
+			String results4 = service.getClassificationMeasures(false);
 			System.out.println(results3);
-			//System.out.println(results4);
+			System.out.println(results4);
 			try {
-				createTxtFile(outputPath+".csv", results3);
+				createTxtFile(outputPath+File.separator+goldStandardAnnotationSet+"_"+evaluationAnnotationSet+".csv", results3);
 			} catch (FileNotFoundException e) {
 				System.out.println("App::processEvaluation :: FileNotFoundException " + outputPath);
 				System.out.println(e);
