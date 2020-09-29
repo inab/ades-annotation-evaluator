@@ -19,8 +19,10 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FilenameUtils;
 
+import gate.Annotation;
 import gate.AnnotationSet;
 import gate.Factory;
+import gate.FeatureMap;
 import gate.Gate;
 import gate.creole.ResourceInstantiationException;
 import gate.util.GateException;
@@ -126,8 +128,66 @@ public class App2 {
 										AnnotationSet as = gateDocument.getAnnotations("CasView0");
 										AnnotationSet findings = as.get("custom:FINDING");
 										AnnotationSet cdog = as.get("custom:CDoG");
+										
 										newDocument.getAnnotations(set_name).addAll(findings);
 										newDocument.getAnnotations(set_name).addAll(cdog);
+										
+										AnnotationSet new_findings = newDocument.getAnnotations(set_name).get("custom:FINDING");
+										AnnotationSet new_cdog = newDocument.getAnnotations(set_name).get("custom:CDoG");
+										
+										FeatureMap document_features = gateDocument.getFeatures();
+										
+										//CDoG_Finging Relation in GATE
+										for (Annotation ann : new_cdog) {
+											if(ann.getFeatures().get("CDoG_Finding")!=null && !ann.getFeatures().get("CDoG_Finding").toString().trim().equals("")) {
+												String[] relations_links =  ann.getFeatures().get("CDoG_Finding").toString().split(" ");
+												for (String relation_id : relations_links) {
+													String entity_source_id = document_features.get("custom:CDoGCDoG_FindingLink_"+relation_id+".target").toString();
+													for (Annotation finding : new_findings) {
+														if(finding.getFeatures().get("xmi:id")!=null && finding.getFeatures().get("xmi:id").equals(entity_source_id)) {
+															newDocument.getAnnotations(set_name).getRelations().addRelation("CDoG_Finding", ann.getId(), finding.getId());
+															System.out.println(ann.getId() + " - CDoG_Finding with - " + finding.getId() );	
+															System.out.println(gate.Utils.stringFor(newDocument, ann) + " - CDoG_Finding with - " + gate.Utils.stringFor(newDocument, finding));	
+														}
+													}
+												}
+											}
+										}
+
+										//CDoG_disc_expression
+										for (Annotation ann : new_cdog) {
+											if(ann.getFeatures().get("disc_expression")!=null && !ann.getFeatures().get("disc_expression").toString().trim().equals("")) {
+												String[] relations_links =  ann.getFeatures().get("disc_expression").toString().split(" ");
+												for (String relation_id : relations_links) {
+													String entity_source_id = document_features.get("custom:CDoGDisc_expressionLink_"+relation_id+".target").toString();
+													for (Annotation finding : new_cdog) {
+														if(finding.getFeatures().get("xmi:id")!=null && finding.getFeatures().get("xmi:id").equals(entity_source_id)) {
+															newDocument.getAnnotations(set_name).getRelations().addRelation("CDoG_disc_expression", ann.getId(), finding.getId());
+															System.out.println(ann.getId() + " - CDoG_disc_expression with - " + finding.getId() );	
+															System.out.println(gate.Utils.stringFor(newDocument, ann) + " - CDoG_disc_expression with - " + gate.Utils.stringFor(newDocument, finding));
+														}
+													}
+												}
+											}
+										}
+										
+										//Finding_disc_expression
+										for (Annotation ann : new_findings) {
+											if(ann.getFeatures().get("disc_expression")!=null && !ann.getFeatures().get("disc_expression").toString().trim().equals("")) {
+												String[] relations_links =  ann.getFeatures().get("disc_expression").toString().split(" ");
+												for (String relation_id : relations_links) {
+													String entity_source_id = document_features.get("custom:FINDINGDisc_expressionLink_"+relation_id+".target").toString();
+													for (Annotation finding : new_findings) {
+														if(finding.getFeatures().get("xmi:id")!=null && finding.getFeatures().get("xmi:id").equals(entity_source_id)) {
+															newDocument.getAnnotations(set_name).getRelations().addRelation("Finding_disc_expression", ann.getId(), finding.getId());
+															System.out.println(ann.getId() + " - Finding_disc_expression with - " + finding.getId() );	
+															System.out.println(gate.Utils.stringFor(newDocument, ann) + " - Finding_disc_expression with - " + gate.Utils.stringFor(newDocument, finding));
+														}
+													}
+												}
+											}
+										}
+
 										newDocument.removeAnnotationSet("CasView0");
 										try {
 											java.io.Writer out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(new FileOutputStream(outputGATEFile, false)));
